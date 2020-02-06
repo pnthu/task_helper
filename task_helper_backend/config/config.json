@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "root",
+    "password": "huutoan99!",
+    "database": "task_helper",
+    "host": "localhost",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  }
+}
