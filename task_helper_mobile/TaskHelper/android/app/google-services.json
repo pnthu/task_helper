@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1060653830628",
+    "firebase_url": "https://taskhelper-cadac.firebaseio.com",
+    "project_id": "taskhelper-cadac",
+    "storage_bucket": "taskhelper-cadac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060653830628:android:725fc2432f527b25e7f7f1",
+        "android_client_info": {
+          "package_name": "com.taskhelper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1060653830628-fgpkm8fn4vv23urpvm80e5dulsa8cnum.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.taskhelper",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1060653830628-383bnpm3s7t4dhi5p5eem6jdg5kgrbqg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.taskhelper",
+            "certificate_hash": "f35bfeff88f980d404245bf9b92c8d3d090c5033"
+          }
+        },
+        {
+          "client_id": "1060653830628-hqplu96ot2sg7vnkrdqs4pb8t1rmc5dd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvgCplIhRQejjMHlsDj7V0zxNy-FkPd_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1060653830628-mvcpcohkiucdt84i275omdvfn5u7sskf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
