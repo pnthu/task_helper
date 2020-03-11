@@ -1,16 +1,16 @@
 import * as React from 'react';
 import {View, Text, Button, TouchableOpacity} from 'react-native';
 
-class HomeScreen extends React.Component {
+class EmployeeListScreen extends React.Component {
   render() {
     return (
       <View>
-        <Text>This is Home Screen</Text>
+        <Text>This is Employee List Screen</Text>
         <TouchableOpacity>
           <Button
-            title="Go to LoginScreen"
+            title="Go to Admin TaskScreen"
             onPress={() => {
-              this.props.navigation.navigate('Login');
+              this.props.navigation.navigate('AdminHome');
             }}></Button>
         </TouchableOpacity>
       </View>
@@ -18,4 +18,4 @@ class HomeScreen extends React.Component {
   }
 }
 
-export default HomeScreen;
+export default EmployeeListScreen;
