@@ -1,11 +1,19 @@
 import * as React from 'react';
-import {View, Image, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native';
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-community/google-signin';
 import AsyncStorage from '@react-native-community/async-storage';
+import firebase from 'react-native-firebase';
 
 class LoginScreen extends React.Component {
   componentDidMount = () => {
@@ -23,13 +31,27 @@ class LoginScreen extends React.Component {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log('Logged In', userInfo);
+      const ref = firebase.database().ref(`/users/${userInfo.user.id}`);
+      const snapshot = await ref.once('value');
+      const user = snapshot.val();
       try {
-        await AsyncStorage.setItem('user-info', JSON.stringify(userInfo));
+        await AsyncStorage.setItem('user-info', JSON.stringify(user));
       } catch (error) {
         console.log('Something was wrong.', error);
       }
-      this.props.navigation.navigate('UserHome');
+      if (user.role === 'user') {
+        this.props.navigation.navigate('UserHome');
+      } else if (user.role === 'manager') {
+        this.props.navigation.navigate('ManagerHome');
+      } else {
+        this.props.navigation.navigate('AdminHome');
+      }
+      // else {
+      //   ToastAndroid.show(
+      //     'You do not have permission to use the app. Contact admin for further details.',
+      //     ToastAndroid.SHORT,
+      //   );
+      // }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User has cancelled');
@@ -43,7 +65,7 @@ class LoginScreen extends React.Component {
     }
   };
 
-  render() {
+  render = () => {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Task Helper</Text>
@@ -62,7 +84,7 @@ class LoginScreen extends React.Component {
         </TouchableOpacity>
       </View>
     );
-  }
+  };
 }
 
 const styles = StyleSheet.create({

@@ -3,16 +3,24 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createBottomTabNavigator} from 'react-navigation-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import LoginScreen from './screens/LoginScreen';
-import TasksScreen from './screens/TasksScreen';
-import EmployeeListScreen from './screens/EmployeeListScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import LoginScreen from './Screens/LoginScreen';
+import TasksScreen from './Screens/TasksScreen';
+import EmployeeListScreen from './Screens/EmployeeListScreen';
+import ProfileScreen from './Screens/ProfileScreen';
+import TaskDetailScreen from './Screens/TaskDetailScreen';
+import CreateTaskScreen from './Screens/CreateTaskScreen';
 
 const TaskStack = createStackNavigator(
   {
     Overview: {screen: TasksScreen, navigationOptions: {headerShown: false}},
-    // TaskDetail: {screen: TaskDetail, navigationOptions: {headerShown: false}},
-    // CreateTask: {screen: CreateTask, navigationOptions: {headerShown: false}},
+    TaskDetail: {
+      screen: TaskDetailScreen,
+      navigationOptions: {headerShown: false},
+    },
+    CreateTask: {
+      screen: CreateTaskScreen,
+      navigationOptions: {headerShown: false},
+    },
   },
   {initialRouteName: 'Overview'},
 );
@@ -20,8 +28,14 @@ const TaskStack = createStackNavigator(
 const SecondTaskStack = createStackNavigator(
   {
     Overview: {screen: TasksScreen, navigationOptions: {headerShown: false}},
-    // TaskDetail: {screen: TaskDetail, navigationOptions: {headerShown: false}},
-    // CreateTask: {screen: CreateTask, navigationOptions: {headerShown: false}},
+    TaskDetail: {
+      screen: TaskDetailScreen,
+      navigationOptions: {headerShown: false},
+    },
+    CreateTask: {
+      screen: CreateTaskScreen,
+      navigationOptions: {headerShown: false},
+    },
     // ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
   },
   {initialRouteName: 'Overview'},
@@ -76,14 +90,15 @@ const UserTabNavigator = createBottomTabNavigator(
 const ManagerTabNavigator = createBottomTabNavigator(
   {
     TaskTab: SecondTaskStack,
+    EmployeeTab: EmployeeStack,
     ProfileTab: ProfileStack,
   },
   {
     tabBarOptions: {
-      activeBackgroundColor: 'white',
-      activeTintColor: '#5bb8ea',
-      inactiveBackgroundColor: '#5bb8ea',
-      inactiveTintColor: 'white',
+      activeBackgroundColor: '#5bb8ea',
+      activeTintColor: 'white',
+      inactiveBackgroundColor: 'white',
+      inactiveTintColor: '#5bb8ea',
     },
     defaultNavigationOptions: ({navigation}) => ({
       tabBarIcon: ({tintColor}) => {
@@ -92,6 +107,8 @@ const ManagerTabNavigator = createBottomTabNavigator(
         let iconName;
         routeName === 'TaskTab'
           ? (iconName = 'tasks')
+          : routeName === 'EmployeeTab'
+          ? (iconName = 'user-cog')
           : (iconName = 'user-circle');
 
         return <Icon name={iconName} size={20} color={tintColor} solid />;
@@ -110,10 +127,10 @@ const AdminTabNavigator = createBottomTabNavigator(
   },
   {
     tabBarOptions: {
-      activeBackgroundColor: 'white',
-      activeTintColor: '#5bb8ea',
-      inactiveBackgroundColor: '#5bb8ea',
-      inactiveTintColor: 'white',
+      activeBackgroundColor: '#5bb8ea',
+      activeTintColor: 'white',
+      inactiveBackgroundColor: 'white',
+      inactiveTintColor: '#5bb8ea',
     },
     defaultNavigationOptions: ({navigation}) => ({
       tabBarIcon: ({tintColor}) => {
