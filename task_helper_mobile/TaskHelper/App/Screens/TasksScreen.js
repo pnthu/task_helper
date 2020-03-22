@@ -95,11 +95,11 @@ class TasksScreen extends React.Component {
         </View>
         {/* status filter here */}
         <Picker mode="dropdown" style={styles.dropdown}>
-          <Picker.Item label="To Do" value="todo" />
-          <Picker.Item label="Processing" value="processing" />
-          <Picker.Item label="Done" value="done" />
-          <Picker.Item label="Approved" value="approved" />
-          <Picker.Item label="Impossible" value="impossible" />
+          <Picker.Item label="To Do" value="To do" />
+          <Picker.Item label="Processing" value="Processing" />
+          <Picker.Item label="Done" value="Done" />
+          <Picker.Item label="Approved" value="Approved" />
+          <Picker.Item label="Impossible" value="Impossible" />
         </Picker>
 
         <FlatList
@@ -120,7 +120,12 @@ class TasksScreen extends React.Component {
                 });
               }}>
               <FontAwesome5 name="clipboard-list" style={styles.icon} />
-              <Text style={{fontWeight: 'bold'}}>{item.item.name}</Text>
+              <Text
+                style={{fontWeight: 'bold', textAlign: 'center'}}
+                numberOfLines={2}
+                ellipsizeMode="tail">
+                {item.item.name}
+              </Text>
             </TouchableOpacity>
           )}
         />

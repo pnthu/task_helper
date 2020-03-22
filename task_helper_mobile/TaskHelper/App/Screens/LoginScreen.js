@@ -75,7 +75,7 @@ class LoginScreen extends React.Component {
         </Text>
         <TouchableOpacity>
           <GoogleSigninButton
-            style={{width: 192, height: 48}}
+            style={{width: 250, height: 48}}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Dark}
             onPress={this._signIn}

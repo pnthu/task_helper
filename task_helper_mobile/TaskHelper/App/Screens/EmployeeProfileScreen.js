@@ -1,17 +1,10 @@
 import * as React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ToastAndroid,
-  TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, View, Text, ToastAndroid, BackHandler} from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-community/async-storage';
 import QRCode from 'react-native-qrcode-svg';
-import {GoogleSignin} from '@react-native-community/google-signin';
 
-class ProfileScreen extends React.Component {
+class EmployeeProfileScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,6 +13,10 @@ class ProfileScreen extends React.Component {
   }
 
   componentDidMount = async () => {
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      this.props.navigation.goBack();
+      return true;
+    });
     try {
       const response = await AsyncStorage.getItem('user-info');
       const userInfo = JSON.parse(response);
@@ -37,45 +34,28 @@ class ProfileScreen extends React.Component {
   };
 
   render = () => {
-    const {info} = this.state;
-    const signOut = async () => {
-      try {
-        await GoogleSignin.revokeAccess();
-        await GoogleSignin.signOut();
-        try {
-          await AsyncStorage.removeItem('user-info');
-          this.props.navigation.navigate('Login');
-        } catch (error) {
-          console.log('Something was wrong.', error);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    const {navigation} = this.props;
+    console.log('info', navigation.state.params.info);
 
     return (
       <View style={styles.container}>
         <View style={styles.qrcode}>
-          <QRCode value={info.id} size={120} />
-          <Text style={styles.title}>My Profile</Text>
+          <QRCode value={navigation.state.params.info.id} size={120} />
+          <Text style={styles.title}>{navigation.state.params.info.name}</Text>
         </View>
         <View style={{marginTop: 8}}>
           <Text style={styles.row}>
-            <Text style={{fontWeight: 'bold'}}>Name:</Text> {info.name}
+            <Text style={{fontWeight: 'bold'}}>Name:</Text>{' '}
+            {navigation.state.params.info.name}
           </Text>
           <Text style={styles.row}>
-            <Text style={{fontWeight: 'bold'}}>Email:</Text> {info.email}
+            <Text style={{fontWeight: 'bold'}}>Email:</Text>{' '}
+            {navigation.state.params.info.email}
           </Text>
           <Text style={styles.row}>
             <Text style={{fontWeight: 'bold'}}>Phone Number:</Text>{' '}
-            {info.phoneNumber}
+            {navigation.state.params.info.phoneNumber}
           </Text>
-          <TouchableOpacity onPress={signOut}>
-            <Text style={styles.row}>
-              Logout {'   '}
-              <FontAwesome5 name="sign-out-alt" style={{fontSize: 17}} />
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
     );
@@ -91,7 +71,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   qrcode: {
-    alignSelf: 'center',
+    alignItems: 'center',
   },
   title: {
     fontWeight: 'bold',
@@ -108,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default EmployeeProfileScreen;

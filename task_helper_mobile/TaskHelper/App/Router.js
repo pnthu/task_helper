@@ -9,6 +9,10 @@ import EmployeeListScreen from './Screens/EmployeeListScreen';
 import ProfileScreen from './Screens/ProfileScreen';
 import TaskDetailScreen from './Screens/TaskDetailScreen';
 import CreateTaskScreen from './Screens/CreateTaskScreen';
+import AssignTaskScreen from './Screens/AssignTaskScreen';
+import AdminEmployeeListScreen from './Screens/AdminEmployeeListScreen';
+import EmployeeProfileScreen from './Screens/EmployeeProfileScreen';
+import ScanQRScreen from './Screens/ScanQRScreen';
 
 const TaskStack = createStackNavigator(
   {
@@ -36,6 +40,10 @@ const SecondTaskStack = createStackNavigator(
       screen: CreateTaskScreen,
       navigationOptions: {headerShown: false},
     },
+    AssignTask: {
+      screen: AssignTaskScreen,
+      navigationOptions: {headerShown: false},
+    },
     // ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
   },
   {initialRouteName: 'Overview'},
@@ -47,11 +55,26 @@ const EmployeeStack = createStackNavigator(
       screen: EmployeeListScreen,
       navigationOptions: {headerShown: false},
     },
+    EmployeeProfile: {
+      screen: EmployeeProfileScreen,
+      navigationOptions: {headerShown: false},
+    },
+    ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
+  },
+  {initialRouteName: 'EmployeeList'},
+);
+
+const AdminEmployeeStack = createStackNavigator(
+  {
+    AdminEmployeeList: {
+      screen: AdminEmployeeListScreen,
+      navigationOptions: {headerShown: false},
+    },
     // CreateEmployee: {screen: CreateEmployee, navigationOptions: {headerShown: false},
     // EditEmployee: {screen: EditEmployee, navigationOptions: {headerShown: false}},
     // CreateGroup: {screen: CreateGroup, navigationOptions: {headerShown: false}},
   },
-  {initialRouteName: 'EmployeeList'},
+  {initialRouteName: 'AdminEmployeeList'},
 );
 
 const ProfileStack = createStackNavigator({
@@ -122,7 +145,7 @@ const ManagerTabNavigator = createBottomTabNavigator(
 const AdminTabNavigator = createBottomTabNavigator(
   {
     TaskTab: SecondTaskStack,
-    EmployeeTab: EmployeeStack,
+    EmployeeTab: AdminEmployeeStack,
     ProfileTab: ProfileStack,
   },
   {

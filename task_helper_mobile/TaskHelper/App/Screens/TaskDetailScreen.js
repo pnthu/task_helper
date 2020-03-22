@@ -59,13 +59,13 @@ class TaskDetailScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>
+        <Text style={styles.title} ellipsizeMode="tail" numberOfLines={1}>
           {navigation.state.params.task.item.name}
         </Text>
         <Picker mode="dropdown" style={styles.dropdown}>
-          <Picker.Item label="To Do" value="todo" />
-          <Picker.Item label="Processing" value="processing" />
-          <Picker.Item label="Done" value="done" />
+          <Picker.Item label="To Do" value="To do" />
+          <Picker.Item label="Processing" value="Processing" />
+          <Picker.Item label="Done" value="Done" />
         </Picker>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Description:</Text>
@@ -123,7 +123,7 @@ class TaskDetailScreen extends React.Component {
               'This task is not started yet '}
           </Text>
           <Text style={{fontStyle: 'italic', color: '#939393'}}>
-            Started At:{' '}
+            Ended At:{' '}
             {navigation.state.params.task.item.endDate ||
               'This task is not ended yet '}
           </Text>

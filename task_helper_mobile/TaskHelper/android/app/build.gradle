@@ -211,7 +211,7 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 project.ext.vectoricons = [
-    iconFontNames: [ 'FontAwesome5_Solid.ttf' ] 
+    iconFontNames: [ 'FontAwesome5_Solid.ttf', 'FontAwesome.ttf' ] 
 ]
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
