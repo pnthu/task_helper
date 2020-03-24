@@ -13,6 +13,8 @@ import AssignTaskScreen from './Screens/AssignTaskScreen';
 import AdminEmployeeListScreen from './Screens/AdminEmployeeListScreen';
 import EmployeeProfileScreen from './Screens/EmployeeProfileScreen';
 import ScanQRScreen from './Screens/ScanQRScreen';
+import CreateEmployeeScreen from './Screens/CreateEmployeeScreen';
+import CreateGroupScreen from './Screens/CreateGroupScreen';
 
 const TaskStack = createStackNavigator(
   {
@@ -70,9 +72,20 @@ const AdminEmployeeStack = createStackNavigator(
       screen: AdminEmployeeListScreen,
       navigationOptions: {headerShown: false},
     },
-    // CreateEmployee: {screen: CreateEmployee, navigationOptions: {headerShown: false},
+    EmployeeProfile: {
+      screen: EmployeeProfileScreen,
+      navigationOptions: {headerShown: false},
+    },
+    CreateEmployee: {
+      screen: CreateEmployeeScreen,
+      navigationOptions: {headerShown: false},
+    },
     // EditEmployee: {screen: EditEmployee, navigationOptions: {headerShown: false}},
-    // CreateGroup: {screen: CreateGroup, navigationOptions: {headerShown: false}},
+    CreateGroup: {
+      screen: CreateGroupScreen,
+      navigationOptions: {headerShown: false},
+    },
+    ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
   },
   {initialRouteName: 'AdminEmployeeList'},
 );

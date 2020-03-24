@@ -56,7 +56,7 @@ class ProfileScreen extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.qrcode}>
-          <QRCode value={info.id} size={120} />
+          <QRCode value={info.id} size={200} />
           <Text style={styles.title}>My Profile</Text>
         </View>
         <View style={{marginTop: 8}}>

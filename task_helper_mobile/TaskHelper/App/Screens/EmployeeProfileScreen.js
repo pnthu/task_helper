@@ -1,14 +1,15 @@
 import * as React from 'react';
 import {StyleSheet, View, Text, ToastAndroid, BackHandler} from 'react-native';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import AsyncStorage from '@react-native-community/async-storage';
 import QRCode from 'react-native-qrcode-svg';
+import AsyncStorage from '@react-native-community/async-storage';
+import firebase from 'react-native-firebase';
 
 class EmployeeProfileScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      info: {},
+      employee: {},
+      user: {},
     };
   }
 
@@ -21,10 +22,18 @@ class EmployeeProfileScreen extends React.Component {
       const response = await AsyncStorage.getItem('user-info');
       const userInfo = JSON.parse(response);
 
+      const ref = firebase
+        .database()
+        .ref(`/users/${this.props.navigation.state.params.id}`);
+      const snapshot = await ref.once('value');
+      const info = snapshot.val();
+
       this.setState({
-        info: userInfo,
+        employee: info,
+        user: userInfo,
       });
     } catch (error) {
+      console.log('error', error);
       this.props.navigation.navigate('Login');
       ToastAndroid.show(
         'Please login to continue using our app',
@@ -35,26 +44,26 @@ class EmployeeProfileScreen extends React.Component {
 
   render = () => {
     const {navigation} = this.props;
-    console.log('info', navigation.state.params.info);
+    console.log('bear', this.state.employee);
 
     return (
       <View style={styles.container}>
         <View style={styles.qrcode}>
-          <QRCode value={navigation.state.params.info.id} size={120} />
-          <Text style={styles.title}>{navigation.state.params.info.name}</Text>
+          <QRCode value={navigation.state.params.id} size={120} />
+          <Text style={styles.title}>{this.state.employee.name}</Text>
         </View>
         <View style={{marginTop: 8}}>
           <Text style={styles.row}>
             <Text style={{fontWeight: 'bold'}}>Name:</Text>{' '}
-            {navigation.state.params.info.name}
+            {this.state.employee.name}
           </Text>
           <Text style={styles.row}>
             <Text style={{fontWeight: 'bold'}}>Email:</Text>{' '}
-            {navigation.state.params.info.email}
+            {this.state.employee.email}
           </Text>
           <Text style={styles.row}>
             <Text style={{fontWeight: 'bold'}}>Phone Number:</Text>{' '}
-            {navigation.state.params.info.phoneNumber}
+            {this.state.employee.phoneNumber}
           </Text>
         </View>
       </View>

@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
   ToastAndroid,
 } from 'react-native';
 import {
@@ -16,7 +17,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'react-native-firebase';
 
 class LoginScreen extends React.Component {
-  componentDidMount = () => {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+    };
+  }
+
+  componentDidMount = async () => {
     GoogleSignin.configure({
       webClientId:
         '1060653830628-mvcpcohkiucdt84i275omdvfn5u7sskf.apps.googleusercontent.com',
@@ -29,8 +37,9 @@ class LoginScreen extends React.Component {
 
   _signIn = async () => {
     try {
+      this.setState({loading: true});
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      var userInfo = await GoogleSignin.signIn();
       const ref = firebase.database().ref(`/users/${userInfo.user.id}`);
       const snapshot = await ref.once('value');
       const user = snapshot.val();
@@ -39,19 +48,15 @@ class LoginScreen extends React.Component {
       } catch (error) {
         console.log('Something was wrong.', error);
       }
+      console.log('user', user);
       if (user.role === 'user') {
         this.props.navigation.navigate('UserHome');
       } else if (user.role === 'manager') {
         this.props.navigation.navigate('ManagerHome');
-      } else {
+      } else if (user.role === 'admin') {
         this.props.navigation.navigate('AdminHome');
       }
-      // else {
-      //   ToastAndroid.show(
-      //     'You do not have permission to use the app. Contact admin for further details.',
-      //     ToastAndroid.SHORT,
-      //   );
-      // }
+      this.setState({loading: false});
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User has cancelled');
@@ -60,7 +65,33 @@ class LoginScreen extends React.Component {
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play service is not available');
       } else {
-        console.log('Another error', error);
+        try {
+          var ref1 = firebase.database().ref(`users/a`);
+          const snapshot = await ref1.once('value');
+          var tmpUser = snapshot.val();
+
+          if (userInfo.user.email === tmpUser.email) {
+            await ref1.remove();
+            const ref2 = firebase.database().ref(`users/${userInfo.user.id}`);
+            tmpUser.id = userInfo.user.id;
+            await ref2.set(tmpUser);
+            if (user.role === 'user') {
+              this.props.navigation.navigate('UserHome');
+            } else if (user.role === 'manager') {
+              this.props.navigation.navigate('ManagerHome');
+            }
+          } else {
+            ToastAndroid.show(
+              'You do not have permission to use the app. Contact admin for further details.',
+              ToastAndroid.LONG,
+            );
+            await GoogleSignin.revokeAccess();
+            await GoogleSignin.signOut();
+          }
+        } catch (error) {
+          console.log('Another error', error);
+          if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut();
+        }
       }
     }
   };
@@ -68,6 +99,12 @@ class LoginScreen extends React.Component {
   render = () => {
     return (
       <View style={styles.container}>
+        <ActivityIndicator
+          animating={this.state.loading}
+          size="large"
+          style={styles.loading}
+          color="#3d66cf"
+        />
         <Text style={styles.title}>Task Helper</Text>
         <Image source={require('../../assets/logo.png')} style={styles.logo} />
         <Text style={styles.introText}>
@@ -110,6 +147,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    backgroundColor: '#F5FCFF88',
   },
 });
 

@@ -66,7 +66,7 @@ class EmployeeListScreen extends React.Component {
           <Text style={styles.title}>Your team: {this.state.teamName}</Text>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ScanQR', {navigation: navigation});
+              navigation.push('ScanQR', {navigation: navigation});
             }}>
             <FontAwesome
               name="qrcode"
@@ -86,8 +86,7 @@ class EmployeeListScreen extends React.Component {
               onPress={() => {
                 navigation.navigate('EmployeeProfile', {
                   navigation: navigation,
-                  info: item.item,
-                  teamName: this.state.teamName,
+                  id: item.item.id,
                 });
               }}>
               <FontAwesome

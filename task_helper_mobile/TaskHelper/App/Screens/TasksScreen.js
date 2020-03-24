@@ -9,6 +9,7 @@ import {
   ToastAndroid,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'react-native-firebase';
@@ -68,67 +69,78 @@ class TasksScreen extends React.Component {
         <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'right'}}>
           this is your task list.
         </Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginTop: 24,
-          }}>
-          {/* from filter here */}
-          <TouchableOpacity
-            style={styles.datePicker}
-            onPress={() => this.setState({showFrom: true})}>
-            <Text style={{color: '#939393'}}>From...</Text>
-          </TouchableOpacity>
-          {this.state.showFrom && (
-            <DateTimePicker value={new Date()} onChange={onChange} />
-          )}
-          {/* - to filter here */}
-          <TouchableOpacity
-            style={styles.datePicker}
-            onPress={() => this.setState({showTo: true})}>
-            <Text style={{color: '#939393'}}>To...</Text>
-          </TouchableOpacity>
-          {this.state.showTo && (
-            <DateTimePicker value={new Date()} onChange={onChange} />
-          )}
-        </View>
-        {/* status filter here */}
-        <Picker mode="dropdown" style={styles.dropdown}>
-          <Picker.Item label="To Do" value="To do" />
-          <Picker.Item label="Processing" value="Processing" />
-          <Picker.Item label="Done" value="Done" />
-          <Picker.Item label="Approved" value="Approved" />
-          <Picker.Item label="Impossible" value="Impossible" />
-        </Picker>
-
-        <FlatList
-          data={this.state.tasks}
-          showsVerticalScrollIndicator={false}
-          numColumns={2}
-          keyExtractor={(item, index) => index.toString()}
-          columnWrapperStyle={{justifyContent: 'space-between'}}
-          style={{marginTop: 24}}
-          renderItem={(item, index) => (
-            <TouchableOpacity
-              style={styles.card}
-              key={index}
-              onPress={() => {
-                navigation.navigate('TaskDetail', {
-                  navigation: navigation,
-                  task: item,
-                });
+        {this.state.tasks.length === 0 ? (
+          <View style={{alignItems: 'center', marginTop: '50%'}}>
+            <FontAwesome name="file-text" style={styles.emptyIcon} />
+            <Text style={styles.emptyText}>
+              You don't have any task to do recently.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: 24,
               }}>
-              <FontAwesome5 name="clipboard-list" style={styles.icon} />
-              <Text
-                style={{fontWeight: 'bold', textAlign: 'center'}}
-                numberOfLines={2}
-                ellipsizeMode="tail">
-                {item.item.name}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
+              {/* from filter here */}
+              <TouchableOpacity
+                style={styles.datePicker}
+                onPress={() => this.setState({showFrom: true})}>
+                <Text style={{color: '#939393'}}>From...</Text>
+              </TouchableOpacity>
+              {this.state.showFrom && (
+                <DateTimePicker value={new Date()} onChange={onChange} />
+              )}
+              {/* - to filter here */}
+              <TouchableOpacity
+                style={styles.datePicker}
+                onPress={() => this.setState({showTo: true})}>
+                <Text style={{color: '#939393'}}>To...</Text>
+              </TouchableOpacity>
+              {this.state.showTo && (
+                <DateTimePicker value={new Date()} onChange={onChange} />
+              )}
+            </View>
+            {/* status filter here */}
+            <Picker mode="dropdown" style={styles.dropdown}>
+              <Picker.Item label="To Do" value="To do" />
+              <Picker.Item label="Processing" value="Processing" />
+              <Picker.Item label="Done" value="Done" />
+              <Picker.Item label="Approved" value="Approved" />
+              <Picker.Item label="Impossible" value="Impossible" />
+            </Picker>
+
+            <FlatList
+              data={this.state.tasks}
+              showsVerticalScrollIndicator={false}
+              numColumns={2}
+              keyExtractor={(item, index) => index.toString()}
+              columnWrapperStyle={{justifyContent: 'space-between'}}
+              style={{marginTop: 24}}
+              renderItem={(item, index) => (
+                <TouchableOpacity
+                  style={styles.card}
+                  key={index}
+                  onPress={() => {
+                    navigation.navigate('TaskDetail', {
+                      navigation: navigation,
+                      task: item,
+                    });
+                  }}>
+                  <FontAwesome5 name="clipboard-list" style={styles.icon} />
+                  <Text
+                    style={{fontWeight: 'bold', textAlign: 'center'}}
+                    numberOfLines={2}
+                    ellipsizeMode="tail">
+                    {item.item.name}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </>
+        )}
 
         <FontAwesome5
           name="plus-circle"
@@ -186,6 +198,13 @@ const styles = StyleSheet.create({
     right: 20,
     fontSize: 32,
     color: '#475397',
+  },
+  emptyIcon: {color: '#94daff', fontSize: 45},
+  emptyText: {
+    fontSize: 20,
+    fontStyle: 'italic',
+    marginTop: 24,
+    textAlign: 'center',
   },
 });
 
