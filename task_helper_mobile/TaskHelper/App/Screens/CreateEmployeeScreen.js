@@ -27,6 +27,7 @@ class CreateEmployeeScreen extends React.Component {
       },
       itemPosition: 0,
       teams: [],
+      existedUsers: [],
       loading: false,
     };
   }
@@ -50,28 +51,46 @@ class CreateEmployeeScreen extends React.Component {
         ],
         {cancelable: false},
       );
-    } else {
-      try {
-        this.setState({loading: true});
-        const ref = firebase.database().ref(`users/${this.state.info.id}`);
-        await ref.set(this.state.info);
-        const position = this.state.teams[this.state.itemPosition].teamMembers
-          .length;
-        const ref1 = firebase
-          .database()
-          .ref(`team/${this.state.info.team}/teamMembers/${position}`);
-        await ref1.set(this.state.info.id);
-        this.setState({loading: false});
-        this.props.navigation.navigate('AdminEmployeeList', {
-          navigation: this.props.navigation,
-        });
-        ToastAndroid.show(`Create employee successfully.`, ToastAndroid.SHORT);
-      } catch (error) {
-        ToastAndroid.show(
-          `Create employee error, ${error}`,
-          ToastAndroid.SHORT,
+      return;
+    }
+
+    for (const user of this.state.existedUsers) {
+      if (user.email === this.state.info.email) {
+        Alert.alert(
+          'Duplicate Email',
+          `The email \"${this.state.info.email}\" has been used. Please try another email`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                return;
+              },
+            },
+          ],
+          {cancelable: false},
         );
+        return;
       }
+    }
+
+    try {
+      this.setState({loading: true});
+      const ref = firebase.database().ref(`users/${this.state.info.id}`);
+      await ref.set(this.state.info);
+      const position = this.state.teams[this.state.itemPosition].teamMembers
+        .length;
+      console.log('position', position);
+      const ref1 = firebase
+        .database()
+        .ref(`team/${this.state.info.team}/teamMembers/${position}`);
+      await ref1.set(this.state.info.id);
+      this.setState({loading: false});
+      this.props.navigation.navigate('AdminEmployeeList', {
+        navigation: this.props.navigation,
+      });
+      ToastAndroid.show(`Create employee successfully.`, ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show(`Create employee error, ${error}`, ToastAndroid.SHORT);
     }
   };
 
@@ -99,6 +118,14 @@ class CreateEmployeeScreen extends React.Component {
         }
         this.setState({teams: results});
       }
+      const ref1 = firebase.database().ref(`/users`);
+      const snapshot1 = await ref1.once('value');
+      const users = snapshot1.val();
+      if (users instanceof Object) {
+        const values = Object.values(users);
+        this.setState({existedUsers: values});
+      }
+
       this.setState({loading: false});
     } catch (error) {
       this.props.navigation.navigate('Login');
@@ -155,6 +182,8 @@ class CreateEmployeeScreen extends React.Component {
         />
         <Text style={styles.label}>Phone Number</Text>
         <TextInput
+          keyboardType="number-pad"
+          maxLength={10}
           style={{borderBottomWidth: 1}}
           onChangeText={text => {
             this.setState({

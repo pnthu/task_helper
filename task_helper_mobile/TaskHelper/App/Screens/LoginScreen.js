@@ -43,11 +43,7 @@ class LoginScreen extends React.Component {
       const ref = firebase.database().ref(`/users/${userInfo.user.id}`);
       const snapshot = await ref.once('value');
       const user = snapshot.val();
-      try {
-        await AsyncStorage.setItem('user-info', JSON.stringify(user));
-      } catch (error) {
-        console.log('Something was wrong.', error);
-      }
+      await AsyncStorage.setItem('user-info', JSON.stringify(user));
       console.log('user', user);
       if (user.role === 'user') {
         this.props.navigation.navigate('UserHome');
@@ -60,37 +56,87 @@ class LoginScreen extends React.Component {
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User has cancelled');
+        this.setState({loading: false});
       } else if (error.code == statusCodes.IN_PROGRESS) {
         console.log('navigate to HomeScreen');
+        this.setState({loading: false});
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play service is not available');
+        this.setState({loading: false});
       } else {
         try {
-          var ref1 = firebase.database().ref(`users/a`);
-          const snapshot = await ref1.once('value');
+          const refUser = firebase.database().ref(`/users/a`);
+          const snapshot = await refUser.once('value');
           var tmpUser = snapshot.val();
-
-          if (userInfo.user.email === tmpUser.email) {
-            await ref1.remove();
+          if (tmpUser && userInfo.user.email === tmpUser.email) {
+            //change user id
+            await refUser.remove();
             const ref2 = firebase.database().ref(`users/${userInfo.user.id}`);
             tmpUser.id = userInfo.user.id;
             await ref2.set(tmpUser);
-            if (user.role === 'user') {
-              this.props.navigation.navigate('UserHome');
-            } else if (user.role === 'manager') {
-              this.props.navigation.navigate('ManagerHome');
+            //change user id in team
+            const ref3 = firebase
+              .database()
+              .ref(`/team/${tmpUser.team}/teamMembers`);
+            const snapshot1 = await ref3.once('value');
+            const teamMembers = snapshot1.val();
+
+            if (teamMembers instanceof Array) {
+              for (let i = 0; i < teamMembers.length; i++) {
+                if (tmpUser.role === 'user' && teamMembers[i] === 'a') {
+                  teamMembers[i] = tmpUser.id;
+                }
+              }
             }
+            // await ref3.remove();
+            await ref3.set(teamMembers);
+            await AsyncStorage.setItem('user-info', JSON.stringify(tmpUser));
+            this.props.navigation.navigate('UserHome');
           } else {
-            ToastAndroid.show(
-              'You do not have permission to use the app. Contact admin for further details.',
-              ToastAndroid.LONG,
-            );
-            await GoogleSignin.revokeAccess();
-            await GoogleSignin.signOut();
+            const refManager = firebase.database().ref(`/users/b`);
+            const snapshot = await refManager.once('value');
+            var tmpManager = snapshot.val();
+            if (tmpManager && userInfo.user.email === tmpManager.email) {
+              //change user id
+              await refManager.remove();
+              const ref2 = firebase.database().ref(`users/${userInfo.user.id}`);
+              tmpManager.id = userInfo.user.id;
+              await ref2.set(tmpManager);
+              //change user id in team
+              const ref3 = firebase
+                .database()
+                .ref(`/team/${tmpManager.team}/teamMembers`);
+              const snapshot1 = await ref3.once('value');
+              const teamMembers = snapshot1.val();
+
+              if (teamMembers instanceof Array) {
+                for (let i = 0; i < teamMembers.length; i++) {
+                  if (tmpManager.role === 'manager' && teamMembers[i] === 'b') {
+                    teamMembers[i] = tmpManager.id;
+                  }
+                }
+              }
+              // await ref3.remove();
+              await ref3.set(teamMembers);
+              await AsyncStorage.setItem(
+                'user-info',
+                JSON.stringify(tmpManager),
+              );
+              this.props.navigation.navigate('ManagerHome');
+            } else {
+              ToastAndroid.show(
+                'You do not have permission to use the app. Contact admin for further details.',
+                ToastAndroid.LONG,
+              );
+              await GoogleSignin.revokeAccess();
+              await GoogleSignin.signOut();
+              this.setState({loading: false});
+            }
           }
         } catch (error) {
           console.log('Another error', error);
           if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut();
+          this.setState({loading: false});
         }
       }
     }
@@ -152,7 +198,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    backgroundColor: '#F5FCFF88',
+    zIndex: 9999,
   },
 });
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import moment from 'moment';
 import {
   StyleSheet,
   Text,
@@ -11,6 +12,8 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from 'react-native';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'react-native-firebase';
 
@@ -21,8 +24,34 @@ class TaskDetailScreen extends React.Component {
       process: '',
       info: {id: ''},
       assigner: {name: ''},
+      uri: '',
     };
   }
+
+  uploadFile = () => {
+    const options = {
+      title: 'Select Image',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+
+    ImagePicker.showImagePicker(options, response => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        const source = {uri: response.uri};
+        this.setState({
+          uri: source,
+        });
+      }
+    });
+  };
 
   componentDidMount = async () => {
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -55,18 +84,20 @@ class TaskDetailScreen extends React.Component {
 
   render = () => {
     const {navigation} = this.props;
-    console.log('bear', JSON.stringify(navigation.state.params.task.item));
+    // console.log('bear', JSON.stringify(navigation.state.params.task.item));
 
     return (
       <View style={styles.container}>
         <Text style={styles.title} ellipsizeMode="tail" numberOfLines={1}>
           {navigation.state.params.task.item.name}
         </Text>
-        <Picker mode="dropdown" style={styles.dropdown}>
-          <Picker.Item label="To Do" value="To do" />
-          <Picker.Item label="Processing" value="Processing" />
-          <Picker.Item label="Done" value="Done" />
-        </Picker>
+        <View style={styles.dropdown}>
+          <Picker mode="dropdown">
+            <Picker.Item label="To Do" value="To do" />
+            <Picker.Item label="Processing" value="Processing" />
+            <Picker.Item label="Done" value="Done" />
+          </Picker>
+        </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Description:</Text>
           <Text>
@@ -112,20 +143,40 @@ class TaskDetailScreen extends React.Component {
               {navigation.state.params.task.item.assignee}
             </Text>
           )}
-          <Text style={{fontStyle: 'italic', color: '#939393'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 18}}>Document:</Text>
+          <View style={styles.btnContainer}>
+            <TouchableOpacity
+              style={styles.btnUpload}
+              onPress={() => {
+                this.uploadFile();
+              }}>
+              <FontAwesome5 name="cloud-upload-alt" style={styles.iconUpload} />
+              <Text style={styles.txtUpload}>Upload Image</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Assigned At:{' '}
-            {navigation.state.params.task.item.createdDate ||
-              'This task is not assigned yet '}
+            {navigation.state.params.task.item.createdDate
+              ? moment(navigation.state.params.task.item.createdDate).format(
+                  'DD-MM-YYYY',
+                )
+              : 'This task is not assigned yet '}
           </Text>
-          <Text style={{fontStyle: 'italic', color: '#939393'}}>
+          <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Started At:{' '}
-            {navigation.state.params.task.item.startDate ||
-              'This task is not started yet '}
+            {navigation.state.params.task.item.startDate
+              ? moment(navigation.state.params.task.item.startDate).format(
+                  'DD-MM-YYYY',
+                )
+              : 'This task is not started yet '}
           </Text>
-          <Text style={{fontStyle: 'italic', color: '#939393'}}>
+          <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Ended At:{' '}
-            {navigation.state.params.task.item.endDate ||
-              'This task is not ended yet '}
+            {navigation.state.params.task.item.endDate
+              ? moment(navigation.state.params.task.item.endDate).format(
+                  'DD-MM-YYYY',
+                )
+              : 'This task is not ended yet '}
           </Text>
 
           <View style={styles.managerView}>
@@ -154,9 +205,12 @@ class TaskDetailScreen extends React.Component {
               {'        '}
               {navigation.state.params.task.item.comment}
             </Text>
-            <Text style={{fontStyle: 'italic', color: '#939393'}}>
+            <Text style={{fontStyle: 'italic', color: '#203f62'}}>
               Last edited comment:{' '}
-              {navigation.state.params.task.item.commentDate}
+              {navigation.state.params.task.item.commentDate &&
+                moment(navigation.state.params.task.item.commentDate).format(
+                  'DD-MM-YYYY',
+                )}
             </Text>
           </View>
         </ScrollView>
@@ -176,6 +230,12 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
   },
+  dropdown: {
+    borderRadius: 8,
+    marginVertical: 12,
+    borderWidth: 1,
+    borderColor: '#dfdfdf',
+  },
   managerView: {
     borderTopWidth: 1,
     borderTopColor: 'gray',
@@ -184,6 +244,31 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderBottomWidth: 1,
+  },
+  btnContainer: {
+    alignItems: 'center',
+    marginBottom: 12,
+    marginTop: 6,
+  },
+  btnUpload: {
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    borderRadius: 12,
+    borderColor: '#b4b4b4',
+    width: '80%',
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  iconUpload: {
+    color: '#b4b4b4',
+    fontSize: 26,
+  },
+  txtUpload: {
+    textAlign: 'center',
+    fontSize: 15,
+    color: '#b4b4b4',
   },
 });
 

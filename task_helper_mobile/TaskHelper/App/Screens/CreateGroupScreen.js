@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   BackHandler,
   TextInput,
-  Picker,
   Alert,
   ToastAndroid,
   ActivityIndicator,
@@ -22,11 +21,12 @@ class CreateGroupScreen extends React.Component {
         email: '',
         phoneNumber: '',
         team: '',
-        id: 'a',
+        id: 'b',
         role: 'manager',
       },
       team: {id: '', name: '', teamMembers: []},
       existedIds: [],
+      existedUsers: [],
       loading: false,
     };
   }
@@ -54,8 +54,8 @@ class CreateGroupScreen extends React.Component {
       );
       return;
     }
-    this.state.existedIds.forEach(element => {
-      if (element === this.state.team.id) {
+    for (const id of this.state.existedIds) {
+      if (id === this.state.team.id) {
         Alert.alert(
           'Duplicate ID',
           `Team ID ${this.state.team.id} is existed. Please try another ID.`,
@@ -71,31 +71,51 @@ class CreateGroupScreen extends React.Component {
         );
         return;
       }
-    });
-    console.log('cant catch');
-    // } else {
-    //   try {
-    //     this.setState({loading: true});
-    //     const ref = firebase.database().ref(`users/${this.state.info.id}`);
-    //     await ref.set(this.state.info);
-    //     const position = this.state.teams[this.state.itemPosition].teamMembers
-    //       .length;
-    //     const ref1 = firebase
-    //       .database()
-    //       .ref(`team/${this.state.info.team}/teamMembers/${position}`);
-    //     await ref1.set(this.state.info.id);
-    //     this.setState({loading: false});
-    //     this.props.navigation.navigate('AdminEmployeeList', {
-    //       navigation: this.props.navigation,
-    //     });
-    //     ToastAndroid.show(`Create employee successfully.`, ToastAndroid.SHORT);
-    //   } catch (error) {
-    //     ToastAndroid.show(
-    //       `Create employee error, ${error}`,
-    //       ToastAndroid.SHORT,
-    //     );
-    //   }
-    // }
+    }
+    for (const user of this.state.existedUsers) {
+      if (user.email === this.state.info.email) {
+        Alert.alert(
+          'Duplicate Email',
+          `The email \"${this.state.info.email}\" has been used. Please try another email`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                return;
+              },
+            },
+          ],
+          {cancelable: false},
+        );
+        return;
+      }
+    }
+    try {
+      this.setState({loading: true});
+      this.setState({
+        team: {
+          id: this.state.team.id,
+          name: this.state.team.name,
+          teamMembers: this.state.team.teamMembers.push(this.state.info.id),
+        },
+      });
+      const ref = firebase.database().ref(`team/${this.state.team.id}`);
+      await ref.set({
+        name: this.state.team.name,
+        teamMembers: this.state.team.teamMembers,
+      });
+
+      const ref1 = firebase.database().ref(`users/${this.state.info.id}`);
+      await ref1.set(this.state.info);
+
+      this.setState({loading: false});
+      this.props.navigation.navigate('AdminEmployeeList', {
+        navigation: this.props.navigation,
+      });
+      ToastAndroid.show(`Create group successfully.`, ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show(`Create employee error, ${error}`, ToastAndroid.SHORT);
+    }
   };
 
   componentDidMount = async () => {
@@ -110,18 +130,16 @@ class CreateGroupScreen extends React.Component {
       const teams = snapshot.val();
       if (teams instanceof Object) {
         const keys = Object.keys(teams);
-        // const values = Object.values(teams);
-        // var results = [];
-        // var team = {};
-        // for (let i = 0; i < keys.length; i++) {
-        //   team.id = keys[i];
-        //       team.name = values[i].name;
-        //       team.teamMembers = values[i].teamMembers;
-        //       results.push(team);
-        //       team = {};
-        // }
         this.setState({existedIds: keys});
       }
+      const ref1 = firebase.database().ref(`/users`);
+      const snapshot1 = await ref1.once('value');
+      const users = snapshot1.val();
+      if (users instanceof Object) {
+        const values = Object.values(users);
+        this.setState({existedUsers: values});
+      }
+
       this.setState({loading: false});
     } catch (error) {
       this.props.navigation.navigate('Login');
@@ -181,7 +199,7 @@ class CreateGroupScreen extends React.Component {
                 email: this.state.info.email,
                 phoneNumber: this.state.info.phoneNumber,
                 team: this.state.team.id,
-                id: 'a',
+                id: 'b',
                 role: 'manager',
               },
             });
@@ -198,7 +216,7 @@ class CreateGroupScreen extends React.Component {
                 email: text,
                 phoneNumber: this.state.info.phoneNumber,
                 team: this.state.team.id,
-                id: 'a',
+                id: 'b',
                 role: 'manager',
               },
             });
@@ -207,6 +225,8 @@ class CreateGroupScreen extends React.Component {
         />
         <Text style={styles.label}>Phone Number</Text>
         <TextInput
+          keyboardType="number-pad"
+          maxLength={10}
           style={{borderBottomWidth: 1}}
           onChangeText={text => {
             this.setState({
@@ -215,8 +235,8 @@ class CreateGroupScreen extends React.Component {
                 email: this.state.info.email,
                 phoneNumber: text,
                 team: this.state.team.id,
-                id: 'a',
-                role: 'user',
+                id: 'b',
+                role: 'manager',
               },
             });
           }}

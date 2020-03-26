@@ -14,8 +14,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'react-native-firebase';
 
-const data = [{}, {}, {}, {}, {}];
-
 class TasksScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -104,14 +102,15 @@ class TasksScreen extends React.Component {
               )}
             </View>
             {/* status filter here */}
-            <Picker mode="dropdown" style={styles.dropdown}>
-              <Picker.Item label="To Do" value="To do" />
-              <Picker.Item label="Processing" value="Processing" />
-              <Picker.Item label="Done" value="Done" />
-              <Picker.Item label="Approved" value="Approved" />
-              <Picker.Item label="Impossible" value="Impossible" />
-            </Picker>
-
+            <View style={styles.dropdown}>
+              <Picker mode="dropdown">
+                <Picker.Item label="To Do" value="To do" />
+                <Picker.Item label="Processing" value="Processing" />
+                <Picker.Item label="Done" value="Done" />
+                <Picker.Item label="Approved" value="Approved" />
+                <Picker.Item label="Impossible" value="Impossible" />
+              </Picker>
+            </View>
             <FlatList
               data={this.state.tasks}
               showsVerticalScrollIndicator={false}
@@ -173,13 +172,10 @@ const styles = StyleSheet.create({
     width: '45%',
   },
   dropdown: {
-    // backgroundColor: '#f0f0f0',
-    // borderRadius: 50,
-    // paddingVertical: 6,
-    // paddingHorizontal: 12,
-    // color: '#939393',
-    // marginTop: 24,
+    borderRadius: 8,
+    marginTop: 12,
     borderWidth: 1,
+    borderColor: '#dfdfdf',
   },
   card: {
     width: '47%',
