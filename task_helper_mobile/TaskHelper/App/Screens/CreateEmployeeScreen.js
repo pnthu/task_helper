@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {EventRegister} from 'react-native-event-listeners';
 import {
   StyleSheet,
   View,
@@ -136,6 +137,10 @@ class CreateEmployeeScreen extends React.Component {
     }
   };
 
+  componentWillUnmount = () => {
+    EventRegister.emit('myCustomEvent');
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -200,28 +205,30 @@ class CreateEmployeeScreen extends React.Component {
           value={this.state.info.phoneNumber}
         />
         <Text style={styles.label}>Team</Text>
-        <Picker
-          mode="dropdown"
-          selectedValue={this.state.info.team}
-          onValueChange={(itemValue, ItemPosition) =>
-            this.setState({
-              info: {
-                name: this.state.info.name,
-                email: this.state.info.email,
-                phoneNumber: this.state.info.phoneNumber,
-                team: itemValue,
-                id: 'a',
-                role: 'user',
-              },
-              itemPosition: ItemPosition,
-            })
-          }>
-          {this.state.teams.map((team, index) => {
-            return (
-              <Picker.Item label={team.name} value={team.id} key={index} />
-            );
-          })}
-        </Picker>
+        <View style={styles.dropdown}>
+          <Picker
+            mode="dropdown"
+            selectedValue={this.state.info.team}
+            onValueChange={(itemValue, ItemPosition) =>
+              this.setState({
+                info: {
+                  name: this.state.info.name,
+                  email: this.state.info.email,
+                  phoneNumber: this.state.info.phoneNumber,
+                  team: itemValue,
+                  id: 'a',
+                  role: 'user',
+                },
+                itemPosition: ItemPosition,
+              })
+            }>
+            {this.state.teams.map((team, index) => {
+              return (
+                <Picker.Item label={team.name} value={team.id} key={index} />
+              );
+            })}
+          </Picker>
+        </View>
         <TouchableOpacity
           style={styles.btnCreate}
           onPress={() => this.createEmp()}>
@@ -256,6 +263,12 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: 8,
+  },
+  dropdown: {
+    borderRadius: 8,
+    marginVertical: 12,
+    borderWidth: 1,
+    borderColor: '#dfdfdf',
   },
   loading: {
     position: 'absolute',

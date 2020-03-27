@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {} from 'lodash';
+import {EventRegister} from 'react-native-event-listeners';
 import {
   StyleSheet,
   View,
@@ -80,6 +80,37 @@ class AdminEmployeeListScreen extends React.Component {
         ToastAndroid.SHORT,
       );
     }
+  };
+
+  componentWillMount = () => {
+    this.listener = EventRegister.addEventListener(
+      'myCustomEvent',
+      async () => {
+        try {
+          this.setState({loading: true});
+          const ref = firebase.database().ref(`/team`);
+          const snapshot = await ref.once('value');
+          const teams = snapshot.val();
+          const teamNames = this.mapTeamName(teams);
+          const abc = await this.mapTeamMembers(teams);
+          var newTeams = [];
+          for (let i = 0; i < teamNames.length; i++) {
+            newTeams.push({title: teamNames[i], content: abc[i]});
+          }
+          this.setState({
+            teams: newTeams,
+            loading: false,
+          });
+        } catch (error) {
+          console.log('error', error);
+          this.props.navigation.navigate('Login');
+          ToastAndroid.show(
+            `Please login to continue using our app, ${error}`,
+            ToastAndroid.SHORT,
+          );
+        }
+      },
+    );
   };
 
   _renderHeader = (item, expanded) => {

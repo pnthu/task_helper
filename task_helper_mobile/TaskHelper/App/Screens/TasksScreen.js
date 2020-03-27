@@ -7,6 +7,7 @@ import {
   Picker,
   FlatList,
   ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -25,27 +26,33 @@ class TasksScreen extends React.Component {
         id: '',
       },
       tasks: [],
+      loading: false,
     };
   }
 
   componentDidMount = async () => {
     try {
+      this.setState({loading: true});
       const response = await AsyncStorage.getItem('user-info');
       const userInfo = JSON.parse(response);
 
       const ref = firebase.database().ref(`/tasks`);
       const snapshot = await ref.once('value');
       const tasks = snapshot.val();
-      const result = [];
-      tasks.forEach(element => {
-        if (element.assignee === userInfo.id) {
-          result.push(element);
+      var result = [];
+      if (tasks instanceof Object) {
+        const allTasks = Object.values(tasks);
+        for (let i = 0; i < allTasks.length; i++) {
+          if (allTasks[i].assignee === userInfo.id) {
+            result.push(allTasks[i]);
+          }
         }
-      });
+      }
       this.setState({
         userInfo: userInfo,
         tasks: result,
       });
+      this.setState({loading: false});
     } catch (error) {
       this.props.navigation.navigate('Login');
       ToastAndroid.show(
@@ -63,11 +70,17 @@ class TasksScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        <ActivityIndicator
+          animating={this.state.loading}
+          size="large"
+          style={styles.loading}
+          color="#3d66cf"
+        />
         <Text style={styles.title}>Hello {this.state.userInfo.name},</Text>
         <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'right'}}>
           this is your task list.
         </Text>
-        {this.state.tasks.length === 0 ? (
+        {this.state.tasks.length === 0 && !this.state.loading ? (
           <View style={{alignItems: 'center', marginTop: '50%'}}>
             <FontAwesome name="file-text" style={styles.emptyIcon} />
             <Text style={styles.emptyText}>
@@ -125,7 +138,7 @@ class TasksScreen extends React.Component {
                   onPress={() => {
                     navigation.navigate('TaskDetail', {
                       navigation: navigation,
-                      task: item,
+                      taskId: item.item.id,
                     });
                   }}>
                   <FontAwesome5 name="clipboard-list" style={styles.icon} />
@@ -201,6 +214,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 24,
     textAlign: 'center',
+  },
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
 });
 

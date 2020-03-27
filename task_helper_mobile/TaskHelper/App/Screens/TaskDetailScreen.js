@@ -11,6 +11,9 @@ import {
   ProgressBarAndroid,
   TouchableOpacity,
   ToastAndroid,
+  ActivityIndicator,
+  Alert,
+  Image,
 } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import ImagePicker from 'react-native-image-picker';
@@ -21,14 +24,30 @@ class TaskDetailScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      process: '',
       info: {id: ''},
-      assigner: {name: ''},
-      uri: '',
+      task: {
+        startDate: '',
+        processingContent: '',
+        point: 0,
+        path: '',
+        id: '',
+        createdDate: '',
+        content: '',
+        commentDate: '',
+        assigner: '',
+        status: '',
+        resource: '',
+        name: '',
+        endDate: '',
+        comment: '',
+        assignee: '',
+      },
+      loading: false,
+      assignerName: '',
     };
   }
 
-  uploadFile = () => {
+  uploadImage = () => {
     const options = {
       title: 'Select Image',
       storageOptions: {
@@ -38,6 +57,7 @@ class TaskDetailScreen extends React.Component {
     };
 
     ImagePicker.showImagePicker(options, response => {
+      // const {data} = response;
       console.log('Response = ', response);
 
       if (response.didCancel) {
@@ -45,33 +65,165 @@ class TaskDetailScreen extends React.Component {
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
-        const source = {uri: response.uri};
         this.setState({
-          uri: source,
+          task: {
+            path: response.uri,
+            startDate: this.state.task.startDate,
+            processingContent: this.state.task.processingContent,
+            point: this.state.task.point,
+            id: this.state.task.id,
+            createdDate: this.state.task.createdDate,
+            content: this.state.task.content,
+            commentDate: this.state.task.commentDate,
+            assigner: this.state.task.assigner,
+            status: this.state.task.status,
+            resource: this.state.task.resource,
+            name: this.state.task.name,
+            endDate: this.state.task.endDate,
+            comment: this.state.task.comment,
+            assignee: this.state.task.assignee,
+          },
         });
       }
     });
   };
 
-  componentDidMount = async () => {
-    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      this.props.navigation.goBack();
-      return true;
+  changeStatus = async status => {
+    const ref = firebase.storage().ref(`Username-TaskId-NewDate.jpg`);
+    const uploadTask = await ref.putFile(this.state.task.path);
+    uploadTask.on('state_changed', snapshot => {
+      if (snapshot.state === 'success') {
+        snapshot.ref.getDownloadURL().then(downloadUrl => {
+          this.setState({
+            task: {
+              startDate: this.state.task.startDate,
+              processingContent: this.state.task.processingContent,
+              point: this.state.task.point,
+              path: downloadUrl,
+              id: this.state.task.id,
+              createdDate: this.state.task.createdDate,
+              content: this.state.task.content,
+              commentDate: this.state.task.commentDate,
+              assigner: this.state.task.assigner,
+              status: status,
+              resource: this.state.task.resource,
+              name: this.state.task.name,
+              endDate: this.state.task.endDate,
+              comment: this.state.task.comment,
+              assignee: this.state.task.assignee,
+            },
+          });
+        });
+      }
     });
+
     try {
+      const ref = firebase
+        .database()
+        .ref(`/tasks/${this.props.navigation.state.params.taskId}`);
+      await ref.set(this.state.task);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  onValueChange = async (itemValue, itemPosition) => {
+    switch (itemValue) {
+      case 'To do': {
+        //call api and refetch here
+        this.setState({loading: true});
+        await this.changeStatus(itemValue);
+        await this.fetchTask();
+        this.setState({loading: false});
+        break;
+      }
+      case 'Processing': {
+        //call api and refetch here
+        this.setState({loading: true});
+        await this.changeStatus(itemValue);
+        await this.fetchTask();
+        this.setState({loading: false});
+        break;
+      }
+      case 'Waiting for approval': {
+        if (
+          this.state.task.processingContent === '' ||
+          this.state.task.path === {}
+        ) {
+          Alert.alert(
+            'Action cannot be done',
+            'Please provide your processing steps and document.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  return;
+                },
+              },
+            ],
+          );
+        } else {
+          //confirm and call api and refetch and disable the picker here
+          this.setState({loading: true});
+          await this.changeStatus(itemValue);
+          await this.fetchTask();
+          this.setState({loading: false});
+        }
+        break;
+      }
+      case 'Impossible': {
+        if (
+          this.state.task.processingContent === '' ||
+          this.state.task.path === ''
+        ) {
+          Alert.alert(
+            'Action cannot be done',
+            'Please provide your reasons for not able to complete the task and document.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  return;
+                },
+              },
+            ],
+          );
+        } else {
+          //confirm and call api and refetch and disable the picker here
+          this.setState({loading: true});
+          await this.changeStatus(itemValue);
+          await this.fetchTask();
+          this.setState({loading: false});
+        }
+        break;
+      }
+    }
+  };
+
+  fetchTask = async () => {
+    try {
+      this.setState({loading: true});
       const response = await AsyncStorage.getItem('user-info');
       const userInfo = JSON.parse(response);
 
       const ref = firebase
         .database()
-        .ref(`/users/${this.props.navigation.state.params.task.item.assigner}`);
+        .ref(`/tasks/${this.props.navigation.state.params.taskId}`);
       const snapshot = await ref.once('value');
-      const assigner = snapshot.val();
+      const task = snapshot.val();
+
+      this.setState({task: task});
+
+      const ref1 = firebase
+        .database()
+        .ref(`/users/${this.state.task.assigner}`);
+      const snapshot1 = await ref1.once('value');
+      var assigner = snapshot1.val();
 
       this.setState({
-        process: this.props.navigation.state.params.task.item.processingContent,
         info: userInfo,
-        assigner: assigner,
+        assignerName: assigner.name,
+        loading: false,
       });
     } catch (error) {
       this.props.navigation.navigate('Login');
@@ -82,51 +234,98 @@ class TaskDetailScreen extends React.Component {
     }
   };
 
-  render = () => {
-    const {navigation} = this.props;
-    // console.log('bear', JSON.stringify(navigation.state.params.task.item));
+  componentDidMount = async () => {
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      this.props.navigation.goBack();
+      return true;
+    });
+    await this.fetchTask();
+  };
 
+  render = () => {
+    // console.log('task', JSON.stringify(this.state.task));
+    // console.log('index', this.props.navigation.state.params.task.index);
+    console.log('path', this.state.task.path);
     return (
       <View style={styles.container}>
+        <ActivityIndicator
+          animating={this.state.loading}
+          size="large"
+          style={styles.loading}
+          color="#3d66cf"
+        />
+
         <Text style={styles.title} ellipsizeMode="tail" numberOfLines={1}>
-          {navigation.state.params.task.item.name}
+          {this.state.task.name}
         </Text>
         <View style={styles.dropdown}>
-          <Picker mode="dropdown">
-            <Picker.Item label="To Do" value="To do" />
+          <Picker
+            enabled={
+              this.state.task.status === 'To do' ||
+              this.state.task.status === 'Processing'
+            }
+            mode="dropdown"
+            selectedValue={this.state.task.status}
+            onValueChange={this.onValueChange}>
+            <Picker.Item label="To do" value="To do" />
             <Picker.Item label="Processing" value="Processing" />
-            <Picker.Item label="Done" value="Done" />
+            <Picker.Item
+              label="Waiting for approval"
+              value="Waiting for approval"
+            />
+            <Picker.Item label="Impossible" value="Impossible" />
           </Picker>
         </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Description:</Text>
           <Text>
             {'        '}
-            {navigation.state.params.task.item.content}
+            {this.state.task.content}
           </Text>
           <Text style={{fontWeight: 'bold', fontSize: 18}}>
             Your processing steps:
           </Text>
           <TextInput
+            editable={
+              this.state.task.status === 'To do' ||
+              this.state.task.status === 'Processing'
+            }
             multiline
             numberOfLines={2}
             onChangeText={text => {
-              this.setState({process: text});
+              this.setState({
+                task: {
+                  startDate: '',
+                  processingContent: text,
+                  point: this.state.task.point,
+                  id: this.state.task.id,
+                  createdDate: this.state.task.createdDate,
+                  content: this.state.task.content,
+                  commentDate: this.state.task.commentDate,
+                  assigner: this.state.task.assigner,
+                  status: this.state.task.status,
+                  resource: this.state.task.resource,
+                  name: this.state.task.name,
+                  endDate: this.state.task.endDate,
+                  comment: this.state.task.comment,
+                  assignee: this.state.task.assignee,
+                },
+              });
             }}
-            value={this.state.process}
+            value={this.state.task.processingContent}
             style={styles.textInput}
           />
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Resource:</Text>
-          {navigation.state.params.task.item.resource ? (
+          {this.state.task.resource ? (
             <TouchableOpacity>
               {'        '}
-              {navigation.state.params.task.item.resource}
+              <Text> {this.state.task.resource}</Text>
             </TouchableOpacity>
           ) : (
             <Text>{'        '}This is a new task</Text>
           )}
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Assigner:</Text>
-          {this.state.info.id === navigation.state.params.task.item.assigner ? (
+          {this.state.info.id === this.state.task.assigner ? (
             <Text>{'        '}You</Text>
           ) : (
             <Text>
@@ -135,65 +334,80 @@ class TaskDetailScreen extends React.Component {
             </Text>
           )}
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Assignee:</Text>
-          {this.state.info.id === navigation.state.params.task.item.assignee ? (
+          {this.state.info.id === this.state.task.assignee ? (
             <Text>{'        '}You</Text>
           ) : (
             <Text>
               {'        '}
-              {navigation.state.params.task.item.assignee}
+              {this.state.task.assignee}
             </Text>
           )}
           <Text style={{fontWeight: 'bold', fontSize: 18}}>Document:</Text>
           <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={styles.btnUpload}
-              onPress={() => {
-                this.uploadFile();
-              }}>
-              <FontAwesome5 name="cloud-upload-alt" style={styles.iconUpload} />
-              <Text style={styles.txtUpload}>Upload Image</Text>
-            </TouchableOpacity>
+            {this.state.task.path ? (
+              <Image
+                source={{uri: this.state.task.path}}
+                style={{
+                  borderWidth: 3,
+                  resizeMode: 'cover',
+                  width: 200,
+                  height: 200,
+                }}
+              />
+            ) : (
+              <TouchableOpacity
+                style={styles.btnUpload}
+                onPress={this.uploadImage}>
+                <FontAwesome5
+                  name="cloud-upload-alt"
+                  style={styles.iconUpload}
+                />
+                <Text style={styles.txtUpload}>Upload Image</Text>
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Assigned At:{' '}
-            {navigation.state.params.task.item.createdDate
-              ? moment(navigation.state.params.task.item.createdDate).format(
-                  'DD-MM-YYYY',
-                )
+            {this.state.task.createdDate
+              ? moment(this.state.task.createdDate).format('DD-MM-YYYY')
               : 'This task is not assigned yet '}
           </Text>
           <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Started At:{' '}
-            {navigation.state.params.task.item.startDate
-              ? moment(navigation.state.params.task.item.startDate).format(
-                  'DD-MM-YYYY',
-                )
+            {this.state.task.startDate
+              ? moment(this.state.task.startDate).format('DD-MM-YYYY')
               : 'This task is not started yet '}
           </Text>
           <Text style={{fontStyle: 'italic', color: '#203f62'}}>
             Ended At:{' '}
-            {navigation.state.params.task.item.endDate
-              ? moment(navigation.state.params.task.item.endDate).format(
-                  'DD-MM-YYYY',
-                )
+            {this.state.task.endDate
+              ? moment(this.state.task.endDate).format('DD-MM-YYYY')
               : 'This task is not ended yet '}
           </Text>
 
           <View style={styles.managerView}>
             <Text
-              style={{fontWeight: 'bold', fontSize: 20, fontStyle: 'italic'}}>
-              Manager's Feedback:{' '}
+              style={{
+                fontWeight: 'bold',
+                fontSize: 20,
+                fontStyle: 'italic',
+                marginBottom: 8,
+              }}>
+              Manager's Feedback:
             </Text>
             <Text style={{fontWeight: 'bold', fontSize: 18}}>
               Evaluation point:
             </Text>
             <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
               <Text style={{width: '5%'}}>0</Text>
               <ProgressBarAndroid
                 styleAttr="Horizontal"
                 indeterminate={false}
-                progress={navigation.state.params.task.item.point / 10}
+                progress={this.state.task.point / 10}
                 style={{width: '80%'}}
               />
               <Text style={{width: '5%'}}>10</Text>
@@ -203,14 +417,12 @@ class TaskDetailScreen extends React.Component {
             </Text>
             <Text style={{fontStyle: 'italic'}}>
               {'        '}
-              {navigation.state.params.task.item.comment}
+              {this.state.task.comment}
             </Text>
             <Text style={{fontStyle: 'italic', color: '#203f62'}}>
               Last edited comment:{' '}
-              {navigation.state.params.task.item.commentDate &&
-                moment(navigation.state.params.task.item.commentDate).format(
-                  'DD-MM-YYYY',
-                )}
+              {this.state.task.commentDate &&
+                moment(this.state.task.commentDate).format('DD-MM-YYYY')}
             </Text>
           </View>
         </ScrollView>
@@ -240,7 +452,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'gray',
     marginTop: 36,
-    paddingTop: 36,
+    paddingTop: 24,
   },
   textInput: {
     borderBottomWidth: 1,
@@ -269,6 +481,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 15,
     color: '#b4b4b4',
+  },
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
 });
 
