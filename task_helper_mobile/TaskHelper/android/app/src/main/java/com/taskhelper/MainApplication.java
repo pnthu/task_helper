@@ -10,6 +10,9 @@ import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage; // <-- Add this line
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -35,6 +38,9 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
            packages.add(new RNFirebaseDatabasePackage()); // <-- Add this line
+           packages.add(new RNFirebaseStoragePackage());
+           packages.add(new RNFirebaseMessagingPackage());
+           packages.add(new RNFirebaseNotificationsPackage());
           return packages;
         }
 

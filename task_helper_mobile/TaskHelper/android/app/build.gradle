@@ -193,6 +193,8 @@ dependencies {
     implementation "com.google.firebase:firebase-core:16.0.9"
     // implementation(project(":react-native-google-signin")) // put this here right?
     implementation "com.google.firebase:firebase-database:17.0.0"
+    implementation "com.google.firebase:firebase-storage:17.0.0"
+    implementation "com.google.firebase:firebase-messaging:18.0.0"
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";

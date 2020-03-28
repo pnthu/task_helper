@@ -57,9 +57,6 @@ class TaskDetailScreen extends React.Component {
     };
 
     ImagePicker.showImagePicker(options, response => {
-      // const {data} = response;
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -89,39 +86,62 @@ class TaskDetailScreen extends React.Component {
   };
 
   changeStatus = async status => {
-    const ref = firebase.storage().ref(`Username-TaskId-NewDate.jpg`);
-    const uploadTask = await ref.putFile(this.state.task.path);
-    uploadTask.on('state_changed', snapshot => {
-      if (snapshot.state === 'success') {
-        snapshot.ref.getDownloadURL().then(downloadUrl => {
-          this.setState({
-            task: {
-              startDate: this.state.task.startDate,
-              processingContent: this.state.task.processingContent,
-              point: this.state.task.point,
-              path: downloadUrl,
-              id: this.state.task.id,
-              createdDate: this.state.task.createdDate,
-              content: this.state.task.content,
-              commentDate: this.state.task.commentDate,
-              assigner: this.state.task.assigner,
-              status: status,
-              resource: this.state.task.resource,
-              name: this.state.task.name,
-              endDate: this.state.task.endDate,
-              comment: this.state.task.comment,
-              assignee: this.state.task.assignee,
-            },
-          });
-        });
-      }
-    });
+    if (status === 'Waiting for approval' || status === 'Impossible') {
+      const ref = firebase
+        .storage()
+        .ref(`${this.state.info.id}-${this.state.task.id}-${moment()}.jpg`);
+      console.log('ref', ref);
+      const uploadTask = await ref.putFile(this.state.task.path);
+      console.log('upload task', uploadTask);
+      this.setState({
+        task: {
+          startDate: this.state.task.startDate,
+          processingContent: this.state.task.processingContent,
+          point: this.state.task.point,
+          path: uploadTask.downloadURL,
+          id: this.state.task.id,
+          createdDate: this.state.task.createdDate,
+          content: this.state.task.content,
+          commentDate: this.state.task.commentDate,
+          assigner: this.state.task.assigner,
+          status: status,
+          resource: this.state.task.resource,
+          name: this.state.task.name,
+          endDate: this.state.task.endDate,
+          comment: this.state.task.comment,
+          assignee: this.state.task.assignee,
+        },
+      });
+    } else {
+      console.log('here');
+      this.setState({
+        task: {
+          startDate: this.state.task.startDate,
+          processingContent: this.state.task.processingContent,
+          point: this.state.task.point,
+          path: this.state.task.path,
+          id: this.state.task.id,
+          createdDate: this.state.task.createdDate,
+          content: this.state.task.content,
+          commentDate: this.state.task.commentDate,
+          assigner: this.state.task.assigner,
+          status: status,
+          resource: this.state.task.resource,
+          name: this.state.task.name,
+          endDate: this.state.task.endDate,
+          comment: this.state.task.comment,
+          assignee: this.state.task.assignee,
+        },
+      });
+    }
 
     try {
       const ref = firebase
         .database()
         .ref(`/tasks/${this.props.navigation.state.params.taskId}`);
+      console.log('here 1');
       await ref.set(this.state.task);
+      console.log('here 2');
     } catch (error) {
       console.log(error);
     }
@@ -130,7 +150,6 @@ class TaskDetailScreen extends React.Component {
   onValueChange = async (itemValue, itemPosition) => {
     switch (itemValue) {
       case 'To do': {
-        //call api and refetch here
         this.setState({loading: true});
         await this.changeStatus(itemValue);
         await this.fetchTask();
@@ -138,7 +157,6 @@ class TaskDetailScreen extends React.Component {
         break;
       }
       case 'Processing': {
-        //call api and refetch here
         this.setState({loading: true});
         await this.changeStatus(itemValue);
         await this.fetchTask();
@@ -163,7 +181,6 @@ class TaskDetailScreen extends React.Component {
             ],
           );
         } else {
-          //confirm and call api and refetch and disable the picker here
           this.setState({loading: true});
           await this.changeStatus(itemValue);
           await this.fetchTask();
@@ -189,7 +206,6 @@ class TaskDetailScreen extends React.Component {
             ],
           );
         } else {
-          //confirm and call api and refetch and disable the picker here
           this.setState({loading: true});
           await this.changeStatus(itemValue);
           await this.fetchTask();
@@ -211,7 +227,6 @@ class TaskDetailScreen extends React.Component {
         .ref(`/tasks/${this.props.navigation.state.params.taskId}`);
       const snapshot = await ref.once('value');
       const task = snapshot.val();
-
       this.setState({task: task});
 
       const ref1 = firebase
@@ -219,7 +234,6 @@ class TaskDetailScreen extends React.Component {
         .ref(`/users/${this.state.task.assigner}`);
       const snapshot1 = await ref1.once('value');
       var assigner = snapshot1.val();
-
       this.setState({
         info: userInfo,
         assignerName: assigner.name,
@@ -243,9 +257,6 @@ class TaskDetailScreen extends React.Component {
   };
 
   render = () => {
-    // console.log('task', JSON.stringify(this.state.task));
-    // console.log('index', this.props.navigation.state.params.task.index);
-    console.log('path', this.state.task.path);
     return (
       <View style={styles.container}>
         <ActivityIndicator
