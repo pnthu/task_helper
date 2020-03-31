@@ -80,7 +80,6 @@ const AdminEmployeeStack = createStackNavigator(
       screen: CreateEmployeeScreen,
       navigationOptions: {headerShown: false},
     },
-    // EditEmployee: {screen: EditEmployee, navigationOptions: {headerShown: false}},
     CreateGroup: {
       screen: CreateGroupScreen,
       navigationOptions: {headerShown: false},

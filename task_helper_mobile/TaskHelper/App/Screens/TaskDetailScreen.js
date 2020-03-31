@@ -89,10 +89,13 @@ class TaskDetailScreen extends React.Component {
     if (status === 'Waiting for approval' || status === 'Impossible') {
       const ref = firebase
         .storage()
-        .ref(`${this.state.info.id}-${this.state.task.id}-${moment()}.jpg`);
+        .ref(
+          `${this.state.info.id}-${this.state.task.id}-${moment().format(
+            'DD/MM/YYYY',
+          )}.jpg`,
+        );
       console.log('ref', ref);
       const uploadTask = await ref.putFile(this.state.task.path);
-      console.log('upload task', uploadTask);
       this.setState({
         task: {
           startDate: this.state.task.startDate,
@@ -166,7 +169,7 @@ class TaskDetailScreen extends React.Component {
       case 'Waiting for approval': {
         if (
           this.state.task.processingContent === '' ||
-          this.state.task.path === {}
+          this.state.task.path === ''
         ) {
           Alert.alert(
             'Action cannot be done',
@@ -181,10 +184,27 @@ class TaskDetailScreen extends React.Component {
             ],
           );
         } else {
-          this.setState({loading: true});
-          await this.changeStatus(itemValue);
-          await this.fetchTask();
-          this.setState({loading: false});
+          Alert.alert(
+            'Confirmation',
+            'Are you sure you have completed this task?',
+            [
+              {
+                text: 'Yes',
+                onPress: async () => {
+                  this.setState({loading: true});
+                  await this.changeStatus(itemValue);
+                  await this.fetchTask();
+                  this.setState({loading: false});
+                },
+              },
+              {
+                text: 'No',
+                onPress: () => {
+                  return;
+                },
+              },
+            ],
+          );
         }
         break;
       }

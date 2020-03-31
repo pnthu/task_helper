@@ -8,7 +8,7 @@ import {
   ToastAndroid,
   ActivityIndicator,
 } from 'react-native';
-import {Accordion} from 'native-base';
+import {Accordion, Fab} from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import firebase from 'react-native-firebase';
@@ -19,6 +19,7 @@ class AdminEmployeeListScreen extends React.Component {
     this.state = {
       teams: [],
       loading: false,
+      active: false,
     };
   }
 
@@ -194,31 +195,42 @@ class AdminEmployeeListScreen extends React.Component {
           renderContent={this._renderContent}
         />
 
-        <TouchableOpacity
-          style={styles.btnNew}
-          onPress={() =>
-            navigation.navigate('CreateEmployee', {navigation: navigation})
-          }>
-          <View>
-            <FontAwesome5
-              name="user-plus"
-              style={{fontSize: 20, color: 'white'}}
-            />
-          </View>
-        </TouchableOpacity>
+        <Fab
+          active={this.state.active}
+          direction="up"
+          style={{backgroundColor: '#475397'}}
+          position="bottomRight"
+          onPress={() => this.setState({active: !this.state.active})}>
+          <FontAwesome5
+            name="user-edit"
+            style={{fontSize: 20, color: 'white'}}
+          />
+          <TouchableOpacity
+            style={styles.btnNew}
+            onPress={() =>
+              navigation.navigate('CreateEmployee', {navigation: navigation})
+            }>
+            <View>
+              <FontAwesome5
+                name="user-plus"
+                style={{fontSize: 20, color: 'white'}}
+              />
+            </View>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.btnNewGroup}
-          onPress={() =>
-            navigation.navigate('CreateGroup', {navigation: navigation})
-          }>
-          <View>
-            <FontAwesome5
-              name="user-friends"
-              style={{fontSize: 20, color: 'white'}}
-            />
-          </View>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnNewGroup}
+            onPress={() =>
+              navigation.navigate('CreateGroup', {navigation: navigation})
+            }>
+            <View>
+              <FontAwesome5
+                name="user-friends"
+                style={{fontSize: 20, color: 'white'}}
+              />
+            </View>
+          </TouchableOpacity>
+        </Fab>
       </View>
     );
   };
@@ -263,9 +275,6 @@ const styles = StyleSheet.create({
     left: '50%',
   },
   btnNew: {
-    position: 'absolute',
-    bottom: 24,
-    right: 20,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -274,9 +283,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#475397',
   },
   btnNewGroup: {
-    position: 'absolute',
-    bottom: 24,
-    left: 20,
     width: 40,
     height: 40,
     borderRadius: 20,
