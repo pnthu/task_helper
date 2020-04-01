@@ -103,159 +103,119 @@ class TasksScreen extends React.Component {
     );
   };
 
-  render = () => {
-    console.log('filter', this.state.filteredTask);
-    const {navigation} = this.props;
-    const onChangeFrom = (event, selectedDate) => {
-      selectedDate &&
-        this.setState({
+  filterTask = (from, to, status) => {
+    console.log('from to status', from, to, status);
+    this.state.tasks.filter(task => {
+      console.log(task.createdDate);
+      if (from !== 'From...') {
+        if (to !== 'To...') {
+          if (status !== '') {
+            //co from to status
+            return (
+              moment(task.createdDate).isSameOrAfter(moment(from)) &&
+              moment(task.createdDate).isSameOrBefore(moment(to)) &&
+              task.status === status
+            );
+          } else {
+            // co from to
+            return (
+              moment(task.createdDate).isSameOrAfter(moment(from)) &&
+              moment(task.createdDate).isSameOrBefore(moment(to))
+            );
+          }
+        } else {
+          if (status !== '') {
+            // co from status
+            return (
+              moment(task.createdDate).isSameOrAfter(moment(from)) &&
+              task.status === status
+            );
+          } else {
+            //chi co from
+            return moment(task.createdDate).isSameOrAfter(moment(from));
+          }
+        }
+      } else if (to !== 'To...') {
+        if (status !== '') {
+          // co to status
+          return (
+            moment(task.createdDate).isSameOrBefore(moment(to)) &&
+            task.status === status
+          );
+        } else {
+          // chi co to
+          return moment(task.createdDate).isSameOrBefore(moment(to));
+        }
+      } else if (status !== '') {
+        //chi co status
+        return task.status === status;
+      } else {
+        return task;
+      }
+    });
+  };
+
+  onChangeFrom = (event, selectedDate) => {
+    selectedDate
+      ? this.setState({
           filter: {
             from: selectedDate,
             to: this.state.filter.to,
             status: this.state.filter.status,
           },
           showFrom: false,
-        });
-      this.setState({
-        filteredTask: filterTask(
-          selectedDate,
-          this.state.filter.to,
-          this.state.filter.status,
-        ),
-      });
-    };
+        })
+      : this.setState({showFrom: false});
 
-    const onChangeTo = (event, selectedDate) => {
-      selectedDate &&
-        this.setState({
+    this.setState({
+      filteredTask: this.filterTask(
+        selectedDate,
+        this.state.filter.to,
+        this.state.filter.status,
+      ),
+    });
+  };
+
+  onChangeTo = (event, selectedDate) => {
+    selectedDate
+      ? this.setState({
           filter: {
             from: this.state.filter.from,
             to: selectedDate,
             status: this.state.filter.status,
           },
           showTo: false,
-        });
-      this.setState({
-        filteredTask: filterTask(
-          this.state.filter.from,
-          selectedDate,
-          this.state.filter.status,
-        ),
-      });
-    };
+        })
+      : this.setState({showTo: false});
+    this.setState({
+      filteredTask: this.filterTask(
+        this.state.filter.from,
+        selectedDate,
+        this.state.filter.status,
+      ),
+    });
+  };
 
-    const onStatusChange = (itemValue, itemPosition) => {
-      this.setState({
-        filter: {
-          from: this.state.filter.from,
-          to: this.state.filter.to,
-          status: itemValue,
-        },
-      });
-      this.setState({
-        filteredTask: filterTask(
-          this.state.filter.from,
-          this.state.filter.to,
-          itemValue,
-        ),
-      });
-    };
+  onStatusChange = (itemValue, itemPosition) => {
+    this.setState({
+      filter: {
+        from: this.state.filter.from,
+        to: this.state.filter.to,
+        status: itemValue,
+      },
+    });
+    this.setState({
+      filteredTask: this.filterTask(
+        this.state.filter.from,
+        this.state.filter.to,
+        itemValue,
+      ),
+    });
+  };
 
-    const filterTask = (from, to, status) => {
-      console.log('from to status', from, to, status);
-      this.state.tasks.filter(task => {
-        if (from !== 'From...') {
-          if (to !== 'To...') {
-            if (status !== '') {
-              console.log(
-                'from to status yes',
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() &&
-                  new Date(task.createdDate).getTime() <=
-                    new Date(to).getTime() &&
-                  task.status === status,
-              );
-
-              //co from to status
-              return (
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() &&
-                new Date(task.createdDate).getTime() <=
-                  new Date(to).getTime() &&
-                task.status === status
-              );
-            } else {
-              // co from to
-              console.log(
-                'from to yes',
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() &&
-                  new Date(task.createdDate).getTime() <=
-                    new Date(to).getTime(),
-              );
-              return (
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() &&
-                new Date(task.createdDate).getTime() <= new Date(to).getTime()
-              );
-            }
-          } else {
-            if (status !== '') {
-              console.log(
-                'from status yes',
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() && task.status === status,
-              );
-              // co from status
-              return (
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime() && task.status === status
-              );
-            } else {
-              console.log(
-                'from yes',
-                new Date(task.createdDate).getTime() >=
-                  new Date(from).getTime(),
-              );
-              //chi co from
-              return (
-                new Date(task.createdDate).getTime() >= new Date(from).getTime()
-              );
-            }
-          }
-        } else if (to !== 'To...') {
-          if (status !== '') {
-            console.log(
-              'to status yes',
-              new Date(task.createdDate).getTime() <= new Date(to).getTime() &&
-                task.status === status,
-            );
-            // co to status
-            return (
-              new Date(task.createdDate).getTime() <= new Date(to).getTime() &&
-              task.status === status
-            );
-          } else {
-            console.log(
-              'to yes',
-              new Date(task.createdDate).getTime() <= new Date(to).getTime(),
-            );
-            // chi co to
-            return (
-              new Date(task.createdDate).getTime() <= new Date(to).getTime()
-            );
-          }
-        } else if (status !== '') {
-          console.log('status yes', task.status === status);
-          //chi co status
-          return task.status === status;
-        } else {
-          console.log('vllll');
-          // ko co cm gi ca
-          return task;
-        }
-      });
-    };
+  render = () => {
+    console.log('filter', this.state.filteredTask);
+    const {navigation} = this.props;
 
     return (
       <View style={styles.container}>
@@ -295,7 +255,10 @@ class TasksScreen extends React.Component {
                 </Text>
               </TouchableOpacity>
               {this.state.showFrom && (
-                <DateTimePicker value={new Date()} onChange={onChangeFrom} />
+                <DateTimePicker
+                  value={new Date()}
+                  onChange={this.onChangeFrom}
+                />
               )}
               {/* - to filter here */}
               <TouchableOpacity
@@ -308,7 +271,7 @@ class TasksScreen extends React.Component {
                 </Text>
               </TouchableOpacity>
               {this.state.showTo && (
-                <DateTimePicker value={new Date()} onChange={onChangeTo} />
+                <DateTimePicker value={new Date()} onChange={this.onChangeTo} />
               )}
             </View>
             {/* status filter here */}
@@ -316,7 +279,7 @@ class TasksScreen extends React.Component {
               <Picker
                 mode="dropdown"
                 selectedValue={this.state.filter.status}
-                onValueChange={onStatusChange}>
+                onValueChange={this.onStatusChange}>
                 <Picker.Item label="Status..." value="" />
                 <Picker.Item
                   label="Waiting for Acceptance"

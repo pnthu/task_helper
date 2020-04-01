@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ToastAndroid,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -20,11 +21,13 @@ class EmployeeListScreen extends React.Component {
       userInfo: {
         team: '',
       },
+      loading: false,
     };
   }
 
   componentDidMount = async () => {
     try {
+      this.setState({loading: true});
       var employees = [];
       const response = await AsyncStorage.getItem('user-info');
       const userInfo = JSON.parse(response);
@@ -47,6 +50,7 @@ class EmployeeListScreen extends React.Component {
         userInfo: userInfo,
         employees: employees,
         teamName: name,
+        loading: false,
       });
     } catch (error) {
       this.props.navigation.navigate('Login');
@@ -62,6 +66,12 @@ class EmployeeListScreen extends React.Component {
     console.log('employees', this.state.employees);
     return (
       <View style={styles.container}>
+        <ActivityIndicator
+          animating={this.state.loading}
+          size="large"
+          style={styles.loading}
+          color="#3d66cf"
+        />
         <View style={styles.header}>
           <Text style={styles.title}>Your team: {this.state.teamName}</Text>
           <TouchableOpacity
@@ -135,6 +145,11 @@ const styles = StyleSheet.create({
     borderTopColor: '#e9eaed',
     alignItems: 'center',
     paddingVertical: 6,
+  },
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
 });
 

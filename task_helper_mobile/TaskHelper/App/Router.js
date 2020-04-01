@@ -62,6 +62,10 @@ const EmployeeStack = createStackNavigator(
       navigationOptions: {headerShown: false},
     },
     ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
+    TaskDetail: {
+      screen: TaskDetailScreen,
+      navigationOptions: {headerShown: false},
+    },
   },
   {initialRouteName: 'EmployeeList'},
 );
@@ -85,6 +89,10 @@ const AdminEmployeeStack = createStackNavigator(
       navigationOptions: {headerShown: false},
     },
     ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
+    TaskDetail: {
+      screen: TaskDetailScreen,
+      navigationOptions: {headerShown: false},
+    },
   },
   {initialRouteName: 'AdminEmployeeList'},
 );

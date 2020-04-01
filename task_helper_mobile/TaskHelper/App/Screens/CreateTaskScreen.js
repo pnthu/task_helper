@@ -132,7 +132,7 @@ class CreateTaskScreen extends React.Component {
         startDate: '',
         status:
           this.state.userInfo.role !== 'admin'
-            ? 'Waiting for approval'
+            ? 'Waiting for acceptance'
             : 'To do',
       },
       loading: true,
