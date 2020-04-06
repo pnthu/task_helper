@@ -1,4 +1,5 @@
 import * as React from 'react';
+import isEmpty from 'lodash';
 import moment from 'moment';
 import {EventRegister} from 'react-native-event-listeners';
 import {
@@ -103,55 +104,66 @@ class TasksScreen extends React.Component {
     );
   };
 
-  filterTask = (from, to, status) => {
+  filterTask = (from = '', to = '', status = '') => {
     console.log('from to status', from, to, status);
-    this.state.tasks.filter(task => {
-      console.log(task.createdDate);
-      if (from !== 'From...') {
-        if (to !== 'To...') {
-          if (status !== '') {
-            //co from to status
-            return (
-              moment(task.createdDate).isSameOrAfter(moment(from)) &&
-              moment(task.createdDate).isSameOrBefore(moment(to)) &&
-              task.status === status
-            );
-          } else {
-            // co from to
-            return (
-              moment(task.createdDate).isSameOrAfter(moment(from)) &&
-              moment(task.createdDate).isSameOrBefore(moment(to))
-            );
-          }
-        } else {
-          if (status !== '') {
-            // co from status
-            return (
-              moment(task.createdDate).isSameOrAfter(moment(from)) &&
-              task.status === status
-            );
-          } else {
-            //chi co from
-            return moment(task.createdDate).isSameOrAfter(moment(from));
-          }
-        }
-      } else if (to !== 'To...') {
-        if (status !== '') {
-          // co to status
-          return (
-            moment(task.createdDate).isSameOrBefore(moment(to)) &&
-            task.status === status
-          );
-        } else {
-          // chi co to
-          return moment(task.createdDate).isSameOrBefore(moment(to));
-        }
-      } else if (status !== '') {
-        //chi co status
-        return task.status === status;
-      } else {
-        return task;
-      }
+    this.state.tasks.filter((task) => {
+      console.log(
+        'bear',
+        (isEmpty(task.from) || moment(createdDate).isSameOrAfter(from)) &&
+          (isEmpty(task.to) || moment(createdDate).isSameOrBefore(to)) &&
+          (isEmpty(status) || task.status === status),
+      );
+      return (
+        (isEmpty(task.from) || moment(createdDate).isSameOrAfter(from)) &&
+        (isEmpty(task.to) || moment(createdDate).isSameOrBefore(to)) &&
+        (isEmpty(status) || task.status === status)
+      );
+      // console.log(task.createdDate);
+      // if (from !== 'From...') {
+      //   if (to !== 'To...') {
+      //     if (status !== '') {
+      //       //co from to status
+      //       return (
+      //         moment(task.createdDate).isSameOrAfter(moment(from)) &&
+      //         moment(task.createdDate).isSameOrBefore(moment(to)) &&
+      //         task.status === status
+      //       );
+      //     } else {
+      //       // co from to
+      //       return (
+      //         moment(task.createdDate).isSameOrAfter(moment(from)) &&
+      //         moment(task.createdDate).isSameOrBefore(moment(to))
+      //       );
+      //     }
+      //   } else {
+      //     if (status !== '') {
+      //       // co from status
+      //       return (
+      //         moment(task.createdDate).isSameOrAfter(moment(from)) &&
+      //         task.status === status
+      //       );
+      //     } else {
+      //       //chi co from
+      //       return moment(task.createdDate).isSameOrAfter(moment(from));
+      //     }
+      //   }
+      // } else if (to !== 'To...') {
+      //   if (status !== '') {
+      //     // co to status
+      //     return (
+      //       moment(task.createdDate).isSameOrBefore(moment(to)) &&
+      //       task.status === status
+      //     );
+      //   } else {
+      //     // chi co to
+      //     return moment(task.createdDate).isSameOrBefore(moment(to));
+      //   }
+      // } else if (status !== '') {
+      //   //chi co status
+      //   return task.status === status;
+      // } else {
+      //   return task;
+      // }
     });
   };
 
