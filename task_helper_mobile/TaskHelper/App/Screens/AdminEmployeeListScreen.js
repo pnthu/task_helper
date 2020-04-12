@@ -23,18 +23,18 @@ class AdminEmployeeListScreen extends React.Component {
     };
   }
 
-  mapTeamName = (teams) => {
+  mapTeamName = teams => {
     if (teams instanceof Object) {
       const nameArray = [];
       const teamArray = Object.values(teams);
-      teamArray.forEach((element) => {
+      teamArray.forEach(element => {
         nameArray.push(element.name);
       });
       return nameArray;
     }
   };
 
-  callDb = async (teamMembers) => {
+  callDb = async teamMembers => {
     var newTeamMembers = [];
     for (const mem of teamMembers) {
       let ref1 = firebase.database().ref(`/users/${mem}`);
@@ -45,7 +45,7 @@ class AdminEmployeeListScreen extends React.Component {
     return newTeamMembers;
   };
 
-  mapTeamMembers = async (teams) => {
+  mapTeamMembers = async teams => {
     if (teams instanceof Object) {
       const teamArray = Object.values(teams);
       var sth = [];
@@ -74,7 +74,6 @@ class AdminEmployeeListScreen extends React.Component {
         loading: false,
       });
     } catch (error) {
-      console.log('error', error);
       this.props.navigation.navigate('Login');
       ToastAndroid.show(
         `Please login to continue using our app, ${error}`,
@@ -103,7 +102,6 @@ class AdminEmployeeListScreen extends React.Component {
             loading: false,
           });
         } catch (error) {
-          console.log('error', error);
           this.props.navigation.navigate('Login');
           ToastAndroid.show(
             `Please login to continue using our app, ${error}`,
@@ -127,7 +125,7 @@ class AdminEmployeeListScreen extends React.Component {
     );
   };
 
-  _renderContent = (item) => {
+  _renderContent = item => {
     const cards = JSON.parse(JSON.stringify(item.content));
     return (
       <>

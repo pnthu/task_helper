@@ -59,7 +59,9 @@ class CreateEmployeeScreen extends React.Component {
       if (user.email === this.state.info.email) {
         Alert.alert(
           'Duplicate Email',
-          `The email \"${this.state.info.email}\" has been used. Please try another email`,
+          `The email \"${
+            this.state.info.email
+          }\" has been used. Please try another email`,
           [
             {
               text: 'OK',
@@ -80,7 +82,6 @@ class CreateEmployeeScreen extends React.Component {
       await ref.set(this.state.info);
       const position = this.state.teams[this.state.itemPosition].teamMembers
         .length;
-      console.log('position', position);
       const ref1 = firebase
         .database()
         .ref(`team/${this.state.info.team}/teamMembers/${position}`);

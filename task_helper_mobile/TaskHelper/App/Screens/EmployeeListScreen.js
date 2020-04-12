@@ -63,7 +63,6 @@ class EmployeeListScreen extends React.Component {
 
   render() {
     const {navigation} = this.props;
-    console.log('employees', this.state.employees);
     return (
       <View style={styles.container}>
         <ActivityIndicator

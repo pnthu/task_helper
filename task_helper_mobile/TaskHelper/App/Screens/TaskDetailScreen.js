@@ -94,7 +94,6 @@ class TaskDetailScreen extends React.Component {
             'DD/MM/YYYY',
           )}.jpg`,
         );
-      console.log('ref', ref);
       const uploadTask = await ref.putFile(this.state.task.path);
       this.setState({
         task: {
@@ -116,7 +115,6 @@ class TaskDetailScreen extends React.Component {
         },
       });
     } else {
-      console.log('here');
       this.setState({
         task: {
           startDate: this.state.task.startDate,
@@ -142,9 +140,7 @@ class TaskDetailScreen extends React.Component {
       const ref = firebase
         .database()
         .ref(`/tasks/${this.props.navigation.state.params.taskId}`);
-      console.log('here 1');
       await ref.set(this.state.task);
-      console.log('here 2');
     } catch (error) {
       console.log(error);
     }

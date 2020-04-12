@@ -5,7 +5,6 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 class ScanQRScreen extends React.Component {
   componentDidMount = () => {
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      console.log('back press');
       this.props.navigation.goBack(null);
       return true;
     });

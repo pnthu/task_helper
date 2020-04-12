@@ -64,7 +64,6 @@ class EmployeeProfileScreen extends React.Component {
         loading: false,
       });
     } catch (error) {
-      console.log('error', error);
       this.props.navigation.navigate('Login');
       ToastAndroid.show(
         'Please login to continue using our app',
@@ -75,7 +74,6 @@ class EmployeeProfileScreen extends React.Component {
 
   render() {
     const {navigation} = this.props;
-    console.log('bear', this.state.tasks);
 
     return (
       <View style={styles.container}>

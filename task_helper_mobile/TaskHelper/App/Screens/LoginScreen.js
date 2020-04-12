@@ -44,7 +44,6 @@ class LoginScreen extends React.Component {
       const snapshot = await ref.once('value');
       const user = snapshot.val();
       await AsyncStorage.setItem('user-info', JSON.stringify(user));
-      console.log('user', user);
       if (user.role === 'user') {
         this.props.navigation.navigate('UserHome');
       } else if (user.role === 'manager') {
@@ -88,7 +87,6 @@ class LoginScreen extends React.Component {
                 }
               }
             }
-            // await ref3.remove();
             await ref3.set(teamMembers);
             await AsyncStorage.setItem('user-info', JSON.stringify(tmpUser));
             this.props.navigation.navigate('UserHome');
@@ -116,7 +114,6 @@ class LoginScreen extends React.Component {
                   }
                 }
               }
-              // await ref3.remove();
               await ref3.set(teamMembers);
               await AsyncStorage.setItem(
                 'user-info',
@@ -162,7 +159,6 @@ class LoginScreen extends React.Component {
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Dark}
             onPress={this._signIn}
-            // disabled={this.state.isSigninInProgress}
           />
         </TouchableOpacity>
       </View>

@@ -324,7 +324,6 @@ class CreateTaskScreen extends React.Component {
   };
 }
 
-//id, resource,
 const styles = StyleSheet.create({
   container: {
     flex: 1,

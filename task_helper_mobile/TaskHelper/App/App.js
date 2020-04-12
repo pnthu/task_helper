@@ -14,34 +14,6 @@ class App extends React.Component {
     );
   };
 
-  // messageListener = async () => {
-  //   this.notificationListener = firebase
-  //     .notifications()
-  //     .onNotification(notification => {
-  //       const {title, body} = notification;
-  //       this.showAlert(title, body);
-  //     });
-
-  //   this.notificationOpenedListener = firebase
-  //     .notifications()
-  //     .onNotificationOpened(notificationOpen => {
-  //       const {title, body} = notificationOpen.notification;
-  //       this.showAlert(title, body);
-  //     });
-
-  //   const notificationOpen = await firebase
-  //     .notifications()
-  //     .getInitialNotification();
-  //   if (notificationOpen) {
-  //     const {title, body} = notificationOpen.notification;
-  //     this.showAlert(title, body);
-  //   }
-
-  //   this.messageListener = firebase.messaging().onMessage(message => {
-  //     console.log(JSON.stringify(message));
-  //   });
-  // };
-
   componentDidMount = async () => {
     this.removeNotificationListener = firebase
       .notifications()

@@ -90,8 +90,6 @@ class EmployeeListScreen extends React.Component {
   };
 
   render() {
-    const {navigation} = this.props;
-    console.log('employees', this.state.employees);
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Your team: {this.state.teamName}</Text>

@@ -46,7 +46,6 @@ const SecondTaskStack = createStackNavigator(
       screen: AssignTaskScreen,
       navigationOptions: {headerShown: false},
     },
-    // ScanQR: {screen: ScanQRScreen, navigationOptions: {headerShown: false}},
   },
   {initialRouteName: 'Overview'},
 );
